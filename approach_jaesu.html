@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>재수반 - 강의 목록</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .wrapper {
+            width: 100%;
+            max-width: 900px;
+        }
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            cursor: pointer;
+            color: #a3a3a3;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .back-btn:hover { color: #ffffff; }
+        
+        .lecture-container {
+            background-color: #1a1a1a;
+            border-radius: 14px;
+            padding: 30px;
+            box-sizing: border-box;
+            border: 1px solid #262626;
+        }
+        h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin: 0 0 25px 0;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #262626;
+            color: #dc2626; /* 재수반 레드 포인트 */
+        }
+        .lecture-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 10px;
+            border-bottom: 1px solid #262626;
+            transition: background-color 0.2s;
+        }
+        .lecture-item:hover {
+            background-color: #222222;
+        }
+        .lecture-item:last-child { border-bottom: none; }
+        
+        .lecture-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #e5e5e5;
+            line-height: 1.4;
+        }
+        .btn-play {
+            background-color: #dc2626;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            border-radius: 6px;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: background-color 0.2s;
+        }
+        .btn-play:hover { background-color: #b91c1c; }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <div class="back-btn" onclick="history.back()">← 메인 화면으로</div>
+
+        <div class="lecture-container">
+            <h1>재수반 전용 강의 리스트</h1>
+
+            <!-- 보내주신 8개 강의 목록 연동 -->
+            <div class="lecture-item">
+                <div class="lecture-title">[해인수 미적 적분법 - 3번, 4번, 5번, 6번]</div>
+                <a href="https://youtu.be/-NColbzSAIM?si=Tsk3PJTiFzSl1Mgi" target="_blank" class="btn-play">영상 보기</a>
+            </div>
+            <div class="lecture-item">
+                <div class="lecture-title">[해인수 미적 적분법 - 2번]</div>
+                <a href="https://youtu.be/HIBg0IAeSIo?si=j5dTHz1NQnPrmZqO" target="_blank" class="btn-play">영상 보기</a>
+            </div>
+            <div class="lecture-item">
+                <div class="lecture-title">[해인수 미적 미분법 - 71번, 72번]</div>
+                <a href="https://youtu.be/72I8NuKIl_8?si=cJMPQPCJdjAe_Pgs" target="_blank" class="btn-play">영상 보기</a>
+            </div>
+            <div class="lecture-item">
+                <div class="lecture-title">[브릿지 5회 - 12번, 14번]</div>
+                <a href="https://youtu.be/UrxACAHLNYY?si=0U18brA_49ZbFqrx" target="_blank" class="btn-play">영상 보기</a>
+            </div>
+            <div class="lecture-item">
+                <div class="lecture-title">[더프 5월 - 22번] & [브릿지 4회 - 14번]</div>
+                <a href="https://youtu.be/uF44ToBsU2I?si=EJ9xI_SmKyTOK7W9" target="_blank" class="btn-play">영상 보기</a>
+            </div>
+            <div class="lecture-item">
+                <div class="lecture-title">[더프 5월 - 14번, 15번, 21번]</div>
+                <a href="https://youtu.be/lk3fOnd8jNk?si=ywWBKJGsHXEoypIq" target="_blank" class="btn-play">영상 보기</a>
+            </div>
+            <div class="lecture-item">
+                <div class="lecture-title">[더프 5월 - 29번, 30번] & [해인수 미적 - 54번, 60번]</div>
+                <a href="https://youtu.be/j4ZjiIMEyBw?si=ZRB   ZCrErtHgWLNZo" target="_blank" class="btn-play">영상 보기</a>
+            </div>
+            <div class="lecture-item">
+                <div class="lecture-title">[해인수 미적 - 65번, 66번, 67번, 69번]</div>
+                <a href="https://youtu.be/GuLah4YphTc?si=jvs-MUTr8MF7Mt6x" target="_blank" class="btn-play">영상 보기</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
