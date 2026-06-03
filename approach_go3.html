@@ -8,282 +8,509 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+        *, *::before, *::after { box-sizing: border-box; }
         body {
             font-family: 'Noto Sans KR', sans-serif;
             background-color: #121212;
-            color: #ffffff;
+            color: #fff;
             margin: 0;
-            padding: 40px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            padding: 24px 20px;
+            min-height: 100vh;
         }
-        .wrapper { width: 100%; max-width: 900px; }
+        .wrapper { max-width: 1200px; margin: 0 auto; }
+
         .back-btn {
             display: inline-block;
-            margin-bottom: 20px;
-            cursor: pointer;
+            margin-bottom: 16px;
             color: #a3a3a3;
             text-decoration: none;
             font-size: 14px;
-        }
-        .back-btn:hover { color: #ffffff; }
-        
-        /* 📺 상단 고정 플레이어 섹션 */
-        .player-section {
-            display: none;
-            background-color: #1a1a1a;
-            border-radius: 14px;
-            padding: 20px;
-            margin-bottom: 30px;
-            border: 1px solid #262626;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        }
-        .video-container {
-            position: relative;
-            width: 100%;
-            padding-bottom: 56.25%;
-            height: 0;
-            overflow: hidden;
-            border-radius: 8px;
-            background-color: #000;
-        }
-        .video-container iframe {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%; border: 0;
-        }
-        .current-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-top: 15px;
-            color: #3b82f6; /* 고3반 블루 포인트 */
-        }
-        .timeline-container {
-            margin-top: 15px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            padding-top: 12px;
-            border-top: 1px solid #262626;
-        }
-        .timeline-btn {
-            background-color: #262626;
-            color: #e5e5e5;
-            border: 1px solid #404040;
-            padding: 6px 14px;
-            font-size: 13px;
-            border-radius: 20px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: color 0.2s;
         }
-        .timeline-btn:hover {
-            background-color: #3b82f6;
-            border-color: #3b82f6;
-            color: #ffffff;
+        .back-btn:hover { color: #fff; }
+
+        .page-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #3b82f6;
+            margin: 0 0 20px 0;
         }
 
-        /* 🗂️ 강의 리스트 섹션 */
-        .lecture-container {
-            background-color: #1a1a1a;
-            border-radius: 14px;
-            padding: 30px;
+        .layout {
+            display: grid;
+            grid-template-columns: 290px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        /* ── 왼쪽 강의 목록 ── */
+        .list-panel {
+            background: #1a1a1a;
             border: 1px solid #262626;
+            border-radius: 14px;
+            position: sticky;
+            top: 20px;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #333 transparent;
         }
-        h1 {
-            font-size: 24px;
+        .list-header {
+            padding: 14px 18px;
+            font-size: 11px;
             font-weight: 700;
-            margin: 0 0 25px 0;
-            padding-bottom: 15px;
+            color: #737373;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             border-bottom: 1px solid #262626;
-            color: #3b82f6;
+            position: sticky;
+            top: 0;
+            background: #1a1a1a;
+            border-radius: 14px 14px 0 0;
+            z-index: 1;
         }
-        .lecture-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 10px;
-            border-bottom: 1px solid #262626;
-        }
-        .lecture-item:hover { background-color: #222222; }
-        .lecture-item:last-child { border-bottom: none; }
-        .lecture-title { font-size: 16px; font-weight: 500; color: #e5e5e5; line-height: 1.4; }
-        
-        .btn-play {
-            background-color: #2563eb;
-            color: #ffffff;
-            border: none;
-            padding: 10px 20px;
-            font-size: 14px;
-            border-radius: 6px;
-            font-weight: 500;
-            white-space: nowrap;
+        .list-item {
+            padding: 13px 18px;
+            font-size: 13px;
+            color: #d4d4d4;
+            line-height: 1.5;
             cursor: pointer;
-            transition: background-color 0.2s;
+            border-bottom: 1px solid #1e1e1e;
+            transition: background 0.15s, color 0.15s;
         }
-        .btn-play:hover { background-color: #1d4ed8; }
+        .list-item:last-child { border-bottom: none; }
+        .list-item:hover { background: #222; color: #fff; }
+        .list-item.active {
+            background: #172554;
+            color: #93c5fd;
+            padding-left: 15px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        /* ── 오른쪽 콘텐츠 ── */
+        .content { display: flex; flex-direction: column; gap: 16px; }
+
+        .placeholder {
+            background: #1a1a1a;
+            border: 1px solid #262626;
+            border-radius: 14px;
+            aspect-ratio: 16/9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            color: #555;
+        }
+        .placeholder-icon { font-size: 44px; opacity: 0.4; }
+        .placeholder-text { font-size: 14px; }
+
+        #playerArea { display: flex; flex-direction: column; gap: 16px; }
+
+        .video-wrap {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .video-wrap iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* ── 목차 인덱스 ── */
+        .index-panel {
+            background: #1a1a1a;
+            border: 1px solid #262626;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .index-header {
+            font-size: 11px;
+            font-weight: 700;
+            color: #737373;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        .ch-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 8px;
+        }
+        .ch-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #111;
+            border: 1px solid #262626;
+            border-radius: 8px;
+            padding: 10px 12px;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .ch-btn:hover { background: #1e2a40; border-color: #3b82f6; }
+        .ch-time {
+            font-size: 12px;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            color: #3b82f6;
+            white-space: nowrap;
+        }
+        .ch-label { font-size: 13px; color: #d4d4d4; }
+        .no-ch { font-size: 13px; color: #555; padding: 4px 0; }
+
+        @media (max-width: 720px) {
+            .layout { grid-template-columns: 1fr; }
+            .list-panel { position: static; max-height: 200px; }
+        }
     </style>
 </head>
 <body>
-    <div class="wrapper">
-        <div class="back-btn" onclick="window.location.href='go3.html'">← 이전 화면으로</div>
+<div class="wrapper">
+    <div class="back-btn" onclick="history.back()">← 이전 화면으로</div>
+    <h1 class="page-title">고3반 어프로치 강의 리스트</h1>
 
-        <div class="player-section" id="playerSection">
-            <div class="video-container"><div id="player"></div></div>
-            <div class="current-title" id="currentTitle">강의를 선택해 주세요.</div>
-            <div class="timeline-container" id="timelineContainer"></div>
-        </div>
+    <div class="layout">
+        <aside class="list-panel">
+            <div class="list-header">강의 목록</div>
+            <div id="lectureList"></div>
+        </aside>
 
-        <div class="lecture-container">
-            <h1>현역반 어프로치 강의 리스트</h1>
-
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 18회 - 9번, 10번, 11번, 20번]</div>
-                <button class="btn-play" data-video="mk5oj1ojb_o" data-title="어프로치 18회 - 9번, 10번, 11번, 20번" data-timeline="0|시작, 120|9번, 430|10번, 760|11번, 1120|20번">영상 보기</button>
-            </div>
-
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 16회 - 11번, 20번] & [어프로치 17회 - 9번, 10번, 11번, 20번]</div>
-                <button class="btn-play" data-video="HexHTOhegww" data-title="어프로치 16/17회 복합" data-timeline="0|시작, 252|16회 11번, 927|17회 9번">영상 보기</button>
+        <section class="content">
+            <div class="placeholder" id="placeholder">
+                <div class="placeholder-icon">▶</div>
+                <div class="placeholder-text">왼쪽에서 강의를 선택하세요</div>
             </div>
 
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 16회 - 14번, 21번] & [어프로치 17회 - 12번, 13번, 14번]</div>
-                <button class="btn-play" data-video="Bu_OhIPMABQ" data-title="[어프로치 16회 - 14번, 21번] & [어프로치 17회 - 12번, 13번, 14번]" data-timeline="">영상 보기</button>
+            <div id="playerArea" style="display:none">
+                <div class="video-wrap">
+                    <iframe id="ytFrame" allowfullscreen
+                        allow="autoplay; encrypted-media; picture-in-picture"></iframe>
+                </div>
+                <div class="index-panel">
+                    <div class="index-header">목차 (타임라인)</div>
+                    <div id="indexList"></div>
+                </div>
             </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 16회 - 12번, 13번]</div>
-                <button class="btn-play" data-video="Daw1UJl_eBI" data-title="[어프로치 16회 - 12번, 13번]" data-timeline="">영상 보기</button>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 15회 - 12번, 13번, 21번]</div>
-                <button class="btn-play" data-video="aeA2xMLzfjo" data-title="[어프로치 15회 - 12번, 13번, 21번]" data-timeline="">영상 보기</button>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 13회 - 20번] & [어프로치 14회 9번, 10번, 11번, 20번]</div>
-                <button class="btn-play" data-video="wYCoQm6K_0k" data-title="[어프로치 13회 - 20번] & [어프로치 14회 9번, 10번, 11번, 20번]" data-timeline="">영상 보기</button>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 15회 - 9번, 10번, 11번, 20번] & [어프로치 16회 - 9번, 10번]</div>
-                <button class="btn-play" data-video="sOUR1ORPfLw" data-title="[어프로치 15회 - 9번, 10번, 11번, 20번] & [어프로치 16회 - 9번, 10번]" data-timeline="">영상 보기</button>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 14회 - 12번, 13번, 14번, 21번]</div>
-                <button class="btn-play" data-video="3_b2Bme2MZU" data-title="[어프로치 14회 - 12번, 13번, 14번, 21번]" data-timeline="">영상 보기</button>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 13회 - 12번, 13번, 14번, 21번]</div>
-                <button class="btn-play" data-video="wJXpP4GIJCg" data-title="[어프로치 13회 - 12번, 13번, 14번, 21번]" data-timeline="">영상 보기</button>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 12회 - 11번, 20번] & [어프로치 13회 - 9번, 10번, 11번]</div>
-                <button class="btn-play" data-video="-VyMsXQKXXc" data-title="[어프로치 12회 - 11번, 20번] & [어프로치 13회 - 9번, 10번, 11번]" data-timeline="">영상 보기</button>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 11회 - 11번, 20번] & [어프로치 12회 - 9번, 10번]</div>
-                <button class="btn-play" data-video="K2jFvsaD0jA" data-title="[어프로치 11회 - 11번, 20번] & [어프로치 12회 - 9번, 10번]" data-timeline="">영상 보기</button>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 11회 - 21번] & [어프로치 12회 - 12번, 13번, 14번]</div>
-                <button class="btn-play" data-video="z2V9-tCu-b4" data-title="[어프로치 11회 - 21번] & [어프로치 12회 - 12번, 13번, 14번]" data-timeline="">영상 보기</button>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 10회 - 13번, 14번, 21번] & [어프로치 11회 - 12번, 13번, 14번]</div>
-                <button class="btn-play" data-video="BGZ0zJGZGdw" data-title="[어프로치 10회 - 13번, 14번, 21번] & [어프로치 11회 - 12번, 13번, 14번]" data-timeline="">영상 보기</button>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 10회 - 9번, 10번, 11번, 20번] & [어프로치 11회 - 9번, 10번]</div>
-                <button class="btn-play" data-video="wkBGY_7unL0" data-title="[어프로치 10회 - 9번, 10번, 11번, 20번] & [어프로치 11회 - 9번, 10번]" data-timeline="">영상 보기</button>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 9회 - 9번, 10번, 12번, 20번]</div>
-                <button class="btn-play" data-video="AeomksAvFNk" data-title="[어프로치 9회 - 9번, 10번, 12번, 20번]" data-timeline="">영상 보기</button>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 9회 - 12번, 13번, 14번, 21번] & [어프로치 10회 - 12번]</div>
-                <button class="btn-play" data-video="YUbjXNAvirY" data-title="[어프로치 9회 - 12번, 13번, 14번, 21번] & [어프로치 10회 - 12번]" data-timeline="">영상 보기</button>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 7회 - 21번] & [어프로치 8회 - 12번, 13번, 14번, 21번]</div>
-                <button class="btn-play" data-video="f_YuInrht80" data-title="[어프로치 7회 - 21번] & [어프로치 8회 - 12번, 13번, 14번, 21번]" data-timeline="">영상 보기</button>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 6회 - 9번, 10번, 11번]</div>
-                <button class="btn-play" data-video="Fd0PlWZZPnI" data-title="[어프로치 6회 - 9번, 10번, 11번]" data-timeline="">영상 보기</button>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 6회 - 20번] & [어프로치 7회 - 9번, 10번, 11번, 20번]</div>
-                <button class="btn-play" data-video="FMX8OywU_jc" data-title="[어프로치 6회 - 20번] & [어프로치 7회 - 9번, 10번, 11번, 20번]" data-timeline="">영상 보기</button>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 6회 - 14번] & [어프로치 7회 - 12번, 13번, 14번]</div>
-                <button class="btn-play" data-video="5oyCAggz-Po" data-title="[어프로치 6회 - 14번] & [어프로치 7회 - 12번, 13번, 14번]" data-timeline="">영상 보기</button>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 5회 - 12번, 13번, 14번, 21번] & [어프로치 6회 - 12번, 13번]</div>
-                <button class="btn-play" data-video="aZxiSmgjeHw" data-title="[어프로치 5회 - 12번, 13번, 14번, 21번] & [어프로치 6회 - 12번, 13번]" data-timeline="">영상 보기</button>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 4회 - 10번, 11번, 20번] & [어프로치 5회 - 9번, 10번, 11번]</div>
-                <button class="btn-play" data-video="aPCpFTi2Fbg" data-title="[어프로치 4회 - 10번, 11번, 20번] & [어프로치 5회 - 9번, 10번, 11번]" data-timeline="">영상 보기</button>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 3회 - 9번, 10번, 11번, 20번] & [어프로치 4회 - 9번]</div>
-                <button class="btn-play" data-video="cbtBRbbkltY" data-title="[어프로치 3회 - 9번, 10번, 11번, 20번] & [어프로치 4회 - 9번]" data-timeline="">영상 보기</button>
-            </div>
-        </div>
+        </section>
     </div>
+</div>
 
-    <script>
-        const tag = document.createElement('script');
-        tag.src = "https://www.youtube.com/iframe_api";
-        const firstScriptTag = document.getElementsByTagName('script')[0];
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+<script>
+// =====================================================================
+// 강의 데이터 — chapters 배열에 타임라인을 추가하세요
+// 형식: { t: 초(숫자), label: "문제명" }
+// 예시: { t: 0, label: "9번" }, { t: 312, label: "10번" }
+// =====================================================================
+const lectures = [
+    {
+        id: "mk5oj1ojb_o",
+        title: "[어프로치 18회 - 9번, 10번, 11번, 20번]",
+        chapters: [
+            // { t: 0, label: "9번" },
+            // { t: 0, label: "10번" },
+            // { t: 0, label: "11번" },
+            // { t: 0, label: "20번" },
+        ]
+    },
+    {
+        id: "HexHTOhegww",
+        title: "[어프로치 16회 - 11번, 20번] & [어프로치 17회 - 9번, 10번, 11번, 20번]",
+        chapters: [
+            // { t: 0, label: "16회 11번" },
+            // { t: 0, label: "16회 20번" },
+            // { t: 0, label: "17회 9번" },
+            // { t: 0, label: "17회 10번" },
+            // { t: 0, label: "17회 11번" },
+            // { t: 0, label: "17회 20번" },
+        ]
+    },
+    {
+        id: "Bu_OhIPMABQ",
+        title: "[어프로치 16회 - 14번, 21번] & [어프로치 17회 - 12번, 13번, 14번]",
+        chapters: [
+            // { t: 0, label: "16회 14번" },
+            // { t: 0, label: "16회 21번" },
+            // { t: 0, label: "17회 12번" },
+            // { t: 0, label: "17회 13번" },
+            // { t: 0, label: "17회 14번" },
+        ]
+    },
+    {
+        id: "Daw1UJl_eBI",
+        title: "[어프로치 16회 - 12번, 13번]",
+        chapters: [
+            // { t: 0, label: "12번" },
+            // { t: 0, label: "13번" },
+        ]
+    },
+    {
+        id: "aeA2xMLzfjo",
+        title: "[어프로치 15회 - 12번, 13번, 21번]",
+        chapters: [
+            // { t: 0, label: "12번" },
+            // { t: 0, label: "13번" },
+            // { t: 0, label: "21번" },
+        ]
+    },
+    {
+        id: "wYCoQm6K_0k",
+        title: "[어프로치 13회 - 20번] & [어프로치 14회 - 9번, 10번, 11번, 20번]",
+        chapters: [
+            // { t: 0, label: "13회 20번" },
+            // { t: 0, label: "14회 9번" },
+            // { t: 0, label: "14회 10번" },
+            // { t: 0, label: "14회 11번" },
+            // { t: 0, label: "14회 20번" },
+        ]
+    },
+    {
+        id: "sOUR1ORPfLw",
+        title: "[어프로치 15회 - 9번, 10번, 11번, 20번] & [어프로치 16회 - 9번, 10번]",
+        chapters: [
+            // { t: 0, label: "15회 9번" },
+            // { t: 0, label: "15회 10번" },
+            // { t: 0, label: "15회 11번" },
+            // { t: 0, label: "15회 20번" },
+            // { t: 0, label: "16회 9번" },
+            // { t: 0, label: "16회 10번" },
+        ]
+    },
+    {
+        id: "3_b2Bme2MZU",
+        title: "[어프로치 14회 - 12번, 13번, 14번, 21번]",
+        chapters: [
+            // { t: 0, label: "12번" },
+            // { t: 0, label: "13번" },
+            // { t: 0, label: "14번" },
+            // { t: 0, label: "21번" },
+        ]
+    },
+    {
+        id: "wJXpP4GIJCg",
+        title: "[어프로치 13회 - 12번, 13번, 14번, 21번]",
+        chapters: [
+            // { t: 0, label: "12번" },
+            // { t: 0, label: "13번" },
+            // { t: 0, label: "14번" },
+            // { t: 0, label: "21번" },
+        ]
+    },
+    {
+        id: "-VyMsXQKXXc",
+        title: "[어프로치 12회 - 11번, 20번] & [어프로치 13회 - 9번, 10번, 11번]",
+        chapters: [
+            // { t: 0, label: "12회 11번" },
+            // { t: 0, label: "12회 20번" },
+            // { t: 0, label: "13회 9번" },
+            // { t: 0, label: "13회 10번" },
+            // { t: 0, label: "13회 11번" },
+        ]
+    },
+    {
+        id: "K2jFvsaD0jA",
+        title: "[어프로치 11회 - 11번, 20번] & [어프로치 12회 - 9번, 10번]",
+        chapters: [
+            // { t: 0, label: "11회 11번" },
+            // { t: 0, label: "11회 20번" },
+            // { t: 0, label: "12회 9번" },
+            // { t: 0, label: "12회 10번" },
+        ]
+    },
+    {
+        id: "z2V9-tCu-b4",
+        title: "[어프로치 11회 - 21번] & [어프로치 12회 - 12번, 13번, 14번]",
+        chapters: [
+            // { t: 0, label: "11회 21번" },
+            // { t: 0, label: "12회 12번" },
+            // { t: 0, label: "12회 13번" },
+            // { t: 0, label: "12회 14번" },
+        ]
+    },
+    {
+        id: "BGZ0zJGZGdw",
+        title: "[어프로치 10회 - 13번, 14번, 21번] & [어프로치 11회 - 12번, 13번, 14번]",
+        chapters: [
+            // { t: 0, label: "10회 13번" },
+            // { t: 0, label: "10회 14번" },
+            // { t: 0, label: "10회 21번" },
+            // { t: 0, label: "11회 12번" },
+            // { t: 0, label: "11회 13번" },
+            // { t: 0, label: "11회 14번" },
+        ]
+    },
+    {
+        id: "wkBGY_7unL0",
+        title: "[어프로치 10회 - 9번, 10번, 11번, 20번] & [어프로치 11회 - 9번, 10번]",
+        chapters: [
+            // { t: 0, label: "10회 9번" },
+            // { t: 0, label: "10회 10번" },
+            // { t: 0, label: "10회 11번" },
+            // { t: 0, label: "10회 20번" },
+            // { t: 0, label: "11회 9번" },
+            // { t: 0, label: "11회 10번" },
+        ]
+    },
+    {
+        id: "AeomksAvFNk",
+        title: "[어프로치 9회 - 9번, 10번, 12번, 20번]",
+        chapters: [
+            // { t: 0, label: "9번" },
+            // { t: 0, label: "10번" },
+            // { t: 0, label: "12번" },
+            // { t: 0, label: "20번" },
+        ]
+    },
+    {
+        id: "YUbjXNAvirY",
+        title: "[어프로치 9회 - 12번, 13번, 14번, 21번] & [어프로치 10회 - 12번]",
+        chapters: [
+            // { t: 0, label: "9회 12번" },
+            // { t: 0, label: "9회 13번" },
+            // { t: 0, label: "9회 14번" },
+            // { t: 0, label: "9회 21번" },
+            // { t: 0, label: "10회 12번" },
+        ]
+    },
+    {
+        id: "f_YuInrht80",
+        title: "[어프로치 7회 - 21번] & [어프로치 8회 - 12번, 13번, 14번, 21번]",
+        chapters: [
+            // { t: 0, label: "7회 21번" },
+            // { t: 0, label: "8회 12번" },
+            // { t: 0, label: "8회 13번" },
+            // { t: 0, label: "8회 14번" },
+            // { t: 0, label: "8회 21번" },
+        ]
+    },
+    {
+        id: "Fd0PlWZZPnI",
+        title: "[어프로치 6회 - 9번, 10번, 11번]",
+        chapters: [
+            // { t: 0, label: "9번" },
+            // { t: 0, label: "10번" },
+            // { t: 0, label: "11번" },
+        ]
+    },
+    {
+        id: "FMX8OywU_jc",
+        title: "[어프로치 6회 - 20번] & [어프로치 7회 - 9번, 10번, 11번, 20번]",
+        chapters: [
+            // { t: 0, label: "6회 20번" },
+            // { t: 0, label: "7회 9번" },
+            // { t: 0, label: "7회 10번" },
+            // { t: 0, label: "7회 11번" },
+            // { t: 0, label: "7회 20번" },
+        ]
+    },
+    {
+        id: "5oyCAggz-Po",
+        title: "[어프로치 6회 - 14번] & [어프로치 7회 - 12번, 13번, 14번]",
+        chapters: [
+            // { t: 0, label: "6회 14번" },
+            // { t: 0, label: "7회 12번" },
+            // { t: 0, label: "7회 13번" },
+            // { t: 0, label: "7회 14번" },
+        ]
+    },
+    {
+        id: "aZxiSmgjeHw",
+        title: "[어프로치 5회 - 12번, 13번, 14번, 21번] & [어프로치 6회 - 12번, 13번]",
+        chapters: [
+            // { t: 0, label: "5회 12번" },
+            // { t: 0, label: "5회 13번" },
+            // { t: 0, label: "5회 14번" },
+            // { t: 0, label: "5회 21번" },
+            // { t: 0, label: "6회 12번" },
+            // { t: 0, label: "6회 13번" },
+        ]
+    },
+    {
+        id: "aPCpFTi2Fbg",
+        title: "[어프로치 4회 - 10번, 11번, 20번] & [어프로치 5회 - 9번, 10번, 11번]",
+        chapters: [
+            // { t: 0, label: "4회 10번" },
+            // { t: 0, label: "4회 11번" },
+            // { t: 0, label: "4회 20번" },
+            // { t: 0, label: "5회 9번" },
+            // { t: 0, label: "5회 10번" },
+            // { t: 0, label: "5회 11번" },
+        ]
+    },
+    {
+        id: "cbtBRbbkltY",
+        title: "[어프로치 3회 - 9번, 10번, 11번, 20번] & [어프로치 4회 - 9번]",
+        chapters: [
+            // { t: 0, label: "3회 9번" },
+            // { t: 0, label: "3회 10번" },
+            // { t: 0, label: "3회 11번" },
+            // { t: 0, label: "3회 20번" },
+            // { t: 0, label: "4회 9번" },
+        ]
+    },
+];
 
-        let player;
-        function onYouTubeIframeAPIReady() {
-            player = new YT.Player('player', {
-                height: '100%', width: '100%', videoId: '',
-                playerVars: { 'rel': 0, 'playsinline': 1 },
-                events: { 'onReady': () => initLectureButtons() }
-            });
-        }
+let currentId = null;
 
-        function initLectureButtons() {
-            document.querySelectorAll('.btn-play').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const videoId = this.getAttribute('data-video');
-                    const title = this.getAttribute('data-title');
-                    const timelineData = this.getAttribute('data-timeline');
-                    if(!videoId) return;
+function toTime(t) {
+    const h = Math.floor(t / 3600);
+    const m = Math.floor((t % 3600) / 60);
+    const s = t % 60;
+    const mm = String(m).padStart(2, '0');
+    const ss = String(s).padStart(2, '0');
+    return h > 0 ? `${h}:${mm}:${ss}` : `${m}:${ss}`;
+}
 
-                    const playerSection = document.getElementById('playerSection');
-                    playerSection.style.display = 'block';
-                    playerSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+function select(idx) {
+    const lec = lectures[idx];
+    currentId = lec.id;
 
-                    player.loadVideoById(videoId);
-                    document.getElementById('currentTitle').innerText = title;
+    document.querySelectorAll('.list-item').forEach((el, i) => {
+        el.classList.toggle('active', i === idx);
+    });
 
-                    const container = document.getElementById('timelineContainer');
-                    container.innerHTML = '';
+    document.getElementById('placeholder').style.display = 'none';
+    document.getElementById('playerArea').style.display = 'flex';
 
-                    if (timelineData && timelineData.trim() !== "") {
-                        timelineData.split(',').forEach(item => {
-                            const [seconds, label] = item.split('|');
-                            const tBtn = document.createElement('button');
-                            tBtn.className = 'timeline-btn';
-                            tBtn.innerText = label.trim();
-                            tBtn.addEventListener('click', () => {
-                                player.seekTo(parseInt(seconds.trim()), true);
-                                player.playVideo();
-                            });
-                            container.appendChild(tBtn);
-                        });
-                    } else {
-                        container.innerHTML = '<span style="font-size:13px; color:#a3a3a3;">등록된 타임라인 인덱스가 없습니다.</span>';
-                    }
-                });
-            });
-        }
-    </script>
+    document.getElementById('ytFrame').src =
+        `https://www.youtube.com/embed/${lec.id}?autoplay=1&rel=0`;
+
+    const list = document.getElementById('indexList');
+    const active = lec.chapters.filter(ch => ch && ch.t !== undefined);
+    if (!active.length) {
+        list.innerHTML = '<div class="no-ch">타임라인이 아직 없습니다</div>';
+    } else {
+        list.innerHTML = `<div class="ch-grid">${
+            active.map(ch => `
+                <button class="ch-btn" onclick="seek(${ch.t})">
+                    <span class="ch-time">${toTime(ch.t)}</span>
+                    <span class="ch-label">${ch.label}</span>
+                </button>
+            `).join('')
+        }</div>`;
+    }
+
+    if (window.innerWidth <= 720) {
+        document.getElementById('playerArea').scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+function seek(t) {
+    document.getElementById('ytFrame').src =
+        `https://www.youtube.com/embed/${currentId}?autoplay=1&start=${t}&rel=0`;
+}
+
+document.getElementById('lectureList').innerHTML = lectures.map((lec, i) => `
+    <div class="list-item" onclick="select(${i})">${lec.title}</div>
+`).join('');
+</script>
 </body>
 </html>
