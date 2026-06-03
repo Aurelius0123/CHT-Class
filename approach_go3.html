@@ -4,187 +4,513 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>고3반 - 어프로치 강의 목록</title>
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-    
     <style>
+        *, *::before, *::after { box-sizing: border-box; }
         body {
             font-family: 'Noto Sans KR', sans-serif;
             background-color: #121212;
-            color: #ffffff;
+            color: #fff;
             margin: 0;
-            padding: 40px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            padding: 24px 20px;
+            min-height: 100vh;
         }
-        .wrapper {
-            width: 100%;
-            max-width: 900px;
-        }
+        .wrapper { max-width: 1200px; margin: 0 auto; }
+
         .back-btn {
             display: inline-block;
-            margin-bottom: 20px;
-            cursor: pointer;
+            margin-bottom: 16px;
             color: #a3a3a3;
             text-decoration: none;
             font-size: 14px;
+            cursor: pointer;
+            transition: color 0.2s;
         }
-        .back-btn:hover { color: #ffffff; }
-        
-        .lecture-container {
-            background-color: #1a1a1a;
-            border-radius: 14px;
-            padding: 30px;
-            box-sizing: border-box;
-            border: 1px solid #262626;
-        }
-        h1 {
-            font-size: 24px;
+        .back-btn:hover { color: #fff; }
+
+        .page-title {
+            font-size: 22px;
             font-weight: 700;
-            margin: 0 0 25px 0;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #262626;
-            color: #3b82f6; /* 고3반 블루 포인트 */
+            color: #3b82f6;
+            margin: 0 0 20px 0;
         }
-        .lecture-item {
+
+        .layout {
+            display: grid;
+            grid-template-columns: 290px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        /* ── 왼쪽 강의 목록 ── */
+        .list-panel {
+            background: #1a1a1a;
+            border: 1px solid #262626;
+            border-radius: 14px;
+            position: sticky;
+            top: 20px;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #333 transparent;
+        }
+        .list-header {
+            padding: 14px 18px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #737373;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #262626;
+            position: sticky;
+            top: 0;
+            background: #1a1a1a;
+            border-radius: 14px 14px 0 0;
+            z-index: 1;
+        }
+        .list-item {
+            padding: 13px 18px;
+            font-size: 13px;
+            color: #d4d4d4;
+            line-height: 1.5;
+            cursor: pointer;
+            border-bottom: 1px solid #1e1e1e;
+            transition: background 0.15s, color 0.15s;
+        }
+        .list-item:last-child { border-bottom: none; }
+        .list-item:hover { background: #222; color: #fff; }
+        .list-item.active {
+            background: #172554;
+            color: #93c5fd;
+            padding-left: 15px;
+            border-left: 3px solid #3b82f6;
+        }
+
+        /* ── 오른쪽 콘텐츠 ── */
+        .content { display: flex; flex-direction: column; gap: 16px; }
+
+        .placeholder {
+            background: #1a1a1a;
+            border: 1px solid #262626;
+            border-radius: 14px;
+            aspect-ratio: 16/9;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            padding: 20px 10px;
-            border-bottom: 1px solid #262626;
-            transition: background-color 0.2s;
+            justify-content: center;
+            gap: 12px;
+            color: #555;
         }
-        .lecture-item:hover {
-            background-color: #222222;
+        .placeholder-icon { font-size: 44px; opacity: 0.4; }
+        .placeholder-text { font-size: 14px; }
+
+        #playerArea { display: flex; flex-direction: column; gap: 16px; }
+
+        .video-wrap {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
         }
-        .lecture-item:last-child { border-bottom: none; }
-        
-        .lecture-title {
-            font-size: 16px;
-            font-weight: 500;
-            color: #e5e5e5;
-            line-height: 1.4;
+        .video-wrap iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
         }
-        .btn-play {
-            background-color: #2563eb;
-            color: #ffffff;
-            text-decoration: none;
-            padding: 10px 20px;
-            font-size: 14px;
-            border-radius: 6px;
-            font-weight: 500;
+
+        /* ── 목차 인덱스 ── */
+        .index-panel {
+            background: #1a1a1a;
+            border: 1px solid #262626;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .index-header {
+            font-size: 11px;
+            font-weight: 700;
+            color: #737373;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        .ch-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 8px;
+        }
+        .ch-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #111;
+            border: 1px solid #262626;
+            border-radius: 8px;
+            padding: 10px 12px;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .ch-btn:hover { background: #1e2a40; border-color: #3b82f6; }
+        .ch-time {
+            font-size: 12px;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            color: #3b82f6;
             white-space: nowrap;
-            transition: background-color 0.2s;
         }
-        .btn-play:hover { background-color: #1d4ed8; }
+        .ch-label { font-size: 13px; color: #d4d4d4; }
+        .no-ch { font-size: 13px; color: #555; padding: 4px 0; }
+
+        @media (max-width: 720px) {
+            .layout { grid-template-columns: 1fr; }
+            .list-panel { position: static; max-height: 200px; }
+        }
     </style>
 </head>
 <body>
+<div class="wrapper">
+    <div class="back-btn" onclick="history.back()">← 이전 화면으로</div>
+    <h1 class="page-title">고3반 어프로치 강의 리스트</h1>
 
-    <div class="wrapper">
-        <div class="back-btn" onclick="history.back()">← 이전 화면으로</div>
+    <div class="layout">
+        <aside class="list-panel">
+            <div class="list-header">강의 목록</div>
+            <div id="lectureList"></div>
+        </aside>
 
-        <div class="lecture-container">
-            <h1>고3반 어프로치 강의 리스트</h1>
+        <section class="content">
+            <div class="placeholder" id="placeholder">
+                <div class="placeholder-icon">▶</div>
+                <div class="placeholder-text">왼쪽에서 강의를 선택하세요</div>
+            </div>
 
-            <!-- 보내주신 23개 강의 목록 연동 -->
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 18회 - 9번, 10번, 11번, 20번]</div>
-                <a href="https://youtu.be/mk5oj1ojb_o?si=h9LU3fRnwELk8BYO" target="_blank" class="btn-play">영상 보기</a>
+            <div id="playerArea" style="display:none">
+                <div class="video-wrap">
+                    <iframe id="ytFrame" allowfullscreen
+                        allow="autoplay; encrypted-media; picture-in-picture"></iframe>
+                </div>
+                <div class="index-panel">
+                    <div class="index-header">목차 (타임라인)</div>
+                    <div id="indexList"></div>
+                </div>
             </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 16회 - 11번, 20번] & [어프로치 17회 - 9번, 10번, 11번, 20번]</div>
-                <a href="https://youtu.be/HexHTOhegww?si=RadL_S-w1hKHhemh" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 16회 - 14번, 21번] & [어프로치 17회 - 12번, 13번, 14번]</div>
-                <a href="https://youtu.be/Bu_OhIPMABQ?si=DlDkGIegM_Cm4CoP" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 16회 - 12번, 13번]</div>
-                <a href="https://youtu.be/Daw1UJl_eBI?si=ZFkOyFa8SzQADTNZ" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 15회 - 12번, 13번, 21번]</div>
-                <a href="https://youtu.be/aeA2xMLzfjo?si=HoOZIaaaV9yJF5ct" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 13회 - 20번] & [어프로치 14회 9번, 10번, 11번, 20번]</div>
-                <a href="https://youtu.be/wYCoQm6K_0k?si=cwtaq2r7CFhDKThG" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 15회 - 9번, 10번, 11번, 20번] & [어프로치 16회 - 9번, 10번]</div>
-                <a href="https://youtu.be/sOUR1ORPfLw?si=I5LtBGM25HofKLah" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 14회 - 12번, 13번, 14번, 21번]</div>
-                <a href="https://youtu.be/3_b2Bme2MZU?si=IUQsOYVwFYvXg4AY" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 13회 - 12번, 13번, 14번, 21번]</div>
-                <a href="https://youtu.be/wJXpP4GIJCg?si=wNcl79QTa5tl2Pce" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 12회 - 11번, 20번] & [어프로치 13회 - 9번, 10번, 11번]</div>
-                <a href="https://youtu.be/-VyMsXQKXXc?si=SnmhGh883r3OnVDC" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 11회 - 11번, 20번] & [어프로치 12회 - 9번, 10번]</div>
-                <a href="https://youtu.be/K2jFvsaD0jA?si=3BCYoyf5LVXMaoz3" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 11회 - 21번] & [어프로치 12회 - 12번, 13번, 14번]</div>
-                <a href="https://youtu.be/z2V9-tCu-b4?si=-dTgYpghyPgsCFUZ" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 10회 - 13번, 14번, 21번] & [어프로치 11회 - 12번, 13번, 14번]</div>
-                <a href="https://youtu.be/BGZ0zJGZGdw?si=lBdWirxdYowmw858" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 10회 - 9번, 10번, 11번, 20번] & [어프로치 11회 - 9번, 10번]</div>
-                <a href="https://youtu.be/wkBGY_7unL0?si=_qWuL4ivUcJXKEIv" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 9회 - 9번, 10번, 12번, 20번]</div>
-                <a href="https://youtu.be/AeomksAvFNk?si=Q5bF0ITgUEM8vdJn" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 9회 - 12번, 13번, 14번, 21번] & [어프로치 10회 - 12번]</div>
-                <a href="https://youtu.be/YUbjXNAvirY?si=yY_PpiFlLMZFH5IK" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 7회 - 21번] & [어프로치 8회 - 12번, 13번, 14번, 21번]</div>
-                <a href="https://youtu.be/f_YuInrht80?si=fTggd800Yr1hsqnD" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 6회 - 9번, 10번, 11번]</div>
-                <a href="https://youtu.be/Fd0PlWZZPnI?si=0_MF_zlikNGqn20I" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 6회 - 20번] & [어프로치 7회 - 9번, 10번, 11번, 20번]</div>
-                <a href="https://youtu.be/FMX8OywU_jc?si=P8qr-4bhewbANmfo" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 6회 - 14번] & [어프로치 7회 - 12번, 13번, 14번]</div>
-                <a href="https://youtu.be/5oyCAggz-Po?si=6i0yicZ5G_hn1Dm5" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 5회 - 12번, 13번, 14번, 21번] & [어프로치 6회 - 12번, 13번]</div>
-                <a href="https://youtu.be/aZxiSmgjeHw?si=EiOuwGWW6bseFIUv" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 4회 - 10번, 11번, 20번] & [어프로치 5회 - 9번, 10번, 11번]</div>
-                <a href="https://youtu.be/aPCpFTi2Fbg?si=JcW6fLlZEnmma1y1" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[어프로치 3회 - 9번, 10번, 11번, 20번] & [어프로치 4회 - 9번]</div>
-                <a href="https://youtu.be/cbtBRbbkltY?si=mgZov7AJUPO1YVba" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-        </div>
+        </section>
     </div>
+</div>
 
+<script>
+// =====================================================================
+// 강의 데이터 — chapters 배열에 타임라인을 추가하세요
+// 형식: { t: 초(숫자), label: "문제명" }
+// 예시: { t: 0, label: "9번" }, { t: 312, label: "10번" }
+// =====================================================================
+const lectures = [
+    {
+        id: "mk5oj1ojb_o",
+        title: "[어프로치 18회 - 9번, 10번, 11번, 20번]",
+        chapters: [
+            // { t: 0, label: "9번" },
+            // { t: 0, label: "10번" },
+            // { t: 0, label: "11번" },
+            // { t: 0, label: "20번" },
+        ]
+    },
+    {
+        id: "HexHTOhegww",
+        title: "[어프로치 16회 - 11번, 20번] & [어프로치 17회 - 9번, 10번, 11번, 20번]",
+        chapters: [
+            // { t: 0, label: "16회 11번" },
+            // { t: 0, label: "16회 20번" },
+            // { t: 0, label: "17회 9번" },
+            // { t: 0, label: "17회 10번" },
+            // { t: 0, label: "17회 11번" },
+            // { t: 0, label: "17회 20번" },
+        ]
+    },
+    {
+        id: "Bu_OhIPMABQ",
+        title: "[어프로치 16회 - 14번, 21번] & [어프로치 17회 - 12번, 13번, 14번]",
+        chapters: [
+            // { t: 0, label: "16회 14번" },
+            // { t: 0, label: "16회 21번" },
+            // { t: 0, label: "17회 12번" },
+            // { t: 0, label: "17회 13번" },
+            // { t: 0, label: "17회 14번" },
+        ]
+    },
+    {
+        id: "Daw1UJl_eBI",
+        title: "[어프로치 16회 - 12번, 13번]",
+        chapters: [
+            // { t: 0, label: "12번" },
+            // { t: 0, label: "13번" },
+        ]
+    },
+    {
+        id: "aeA2xMLzfjo",
+        title: "[어프로치 15회 - 12번, 13번, 21번]",
+        chapters: [
+            // { t: 0, label: "12번" },
+            // { t: 0, label: "13번" },
+            // { t: 0, label: "21번" },
+        ]
+    },
+    {
+        id: "wYCoQm6K_0k",
+        title: "[어프로치 13회 - 20번] & [어프로치 14회 - 9번, 10번, 11번, 20번]",
+        chapters: [
+            // { t: 0, label: "13회 20번" },
+            // { t: 0, label: "14회 9번" },
+            // { t: 0, label: "14회 10번" },
+            // { t: 0, label: "14회 11번" },
+            // { t: 0, label: "14회 20번" },
+        ]
+    },
+    {
+        id: "sOUR1ORPfLw",
+        title: "[어프로치 15회 - 9번, 10번, 11번, 20번] & [어프로치 16회 - 9번, 10번]",
+        chapters: [
+            // { t: 0, label: "15회 9번" },
+            // { t: 0, label: "15회 10번" },
+            // { t: 0, label: "15회 11번" },
+            // { t: 0, label: "15회 20번" },
+            // { t: 0, label: "16회 9번" },
+            // { t: 0, label: "16회 10번" },
+        ]
+    },
+    {
+        id: "3_b2Bme2MZU",
+        title: "[어프로치 14회 - 12번, 13번, 14번, 21번]",
+        chapters: [
+            // { t: 0, label: "12번" },
+            // { t: 0, label: "13번" },
+            // { t: 0, label: "14번" },
+            // { t: 0, label: "21번" },
+        ]
+    },
+    {
+        id: "wJXpP4GIJCg",
+        title: "[어프로치 13회 - 12번, 13번, 14번, 21번]",
+        chapters: [
+            // { t: 0, label: "12번" },
+            // { t: 0, label: "13번" },
+            // { t: 0, label: "14번" },
+            // { t: 0, label: "21번" },
+        ]
+    },
+    {
+        id: "-VyMsXQKXXc",
+        title: "[어프로치 12회 - 11번, 20번] & [어프로치 13회 - 9번, 10번, 11번]",
+        chapters: [
+            // { t: 0, label: "12회 11번" },
+            // { t: 0, label: "12회 20번" },
+            // { t: 0, label: "13회 9번" },
+            // { t: 0, label: "13회 10번" },
+            // { t: 0, label: "13회 11번" },
+        ]
+    },
+    {
+        id: "K2jFvsaD0jA",
+        title: "[어프로치 11회 - 11번, 20번] & [어프로치 12회 - 9번, 10번]",
+        chapters: [
+            // { t: 0, label: "11회 11번" },
+            // { t: 0, label: "11회 20번" },
+            // { t: 0, label: "12회 9번" },
+            // { t: 0, label: "12회 10번" },
+        ]
+    },
+    {
+        id: "z2V9-tCu-b4",
+        title: "[어프로치 11회 - 21번] & [어프로치 12회 - 12번, 13번, 14번]",
+        chapters: [
+            // { t: 0, label: "11회 21번" },
+            // { t: 0, label: "12회 12번" },
+            // { t: 0, label: "12회 13번" },
+            // { t: 0, label: "12회 14번" },
+        ]
+    },
+    {
+        id: "BGZ0zJGZGdw",
+        title: "[어프로치 10회 - 13번, 14번, 21번] & [어프로치 11회 - 12번, 13번, 14번]",
+        chapters: [
+            // { t: 0, label: "10회 13번" },
+            // { t: 0, label: "10회 14번" },
+            // { t: 0, label: "10회 21번" },
+            // { t: 0, label: "11회 12번" },
+            // { t: 0, label: "11회 13번" },
+            // { t: 0, label: "11회 14번" },
+        ]
+    },
+    {
+        id: "wkBGY_7unL0",
+        title: "[어프로치 10회 - 9번, 10번, 11번, 20번] & [어프로치 11회 - 9번, 10번]",
+        chapters: [
+            // { t: 0, label: "10회 9번" },
+            // { t: 0, label: "10회 10번" },
+            // { t: 0, label: "10회 11번" },
+            // { t: 0, label: "10회 20번" },
+            // { t: 0, label: "11회 9번" },
+            // { t: 0, label: "11회 10번" },
+        ]
+    },
+    {
+        id: "AeomksAvFNk",
+        title: "[어프로치 9회 - 9번, 10번, 12번, 20번]",
+        chapters: [
+            // { t: 0, label: "9번" },
+            // { t: 0, label: "10번" },
+            // { t: 0, label: "12번" },
+            // { t: 0, label: "20번" },
+        ]
+    },
+    {
+        id: "YUbjXNAvirY",
+        title: "[어프로치 9회 - 12번, 13번, 14번, 21번] & [어프로치 10회 - 12번]",
+        chapters: [
+            // { t: 0, label: "9회 12번" },
+            // { t: 0, label: "9회 13번" },
+            // { t: 0, label: "9회 14번" },
+            // { t: 0, label: "9회 21번" },
+            // { t: 0, label: "10회 12번" },
+        ]
+    },
+    {
+        id: "f_YuInrht80",
+        title: "[어프로치 7회 - 21번] & [어프로치 8회 - 12번, 13번, 14번, 21번]",
+        chapters: [
+            // { t: 0, label: "7회 21번" },
+            // { t: 0, label: "8회 12번" },
+            // { t: 0, label: "8회 13번" },
+            // { t: 0, label: "8회 14번" },
+            // { t: 0, label: "8회 21번" },
+        ]
+    },
+    {
+        id: "Fd0PlWZZPnI",
+        title: "[어프로치 6회 - 9번, 10번, 11번]",
+        chapters: [
+            // { t: 0, label: "9번" },
+            // { t: 0, label: "10번" },
+            // { t: 0, label: "11번" },
+        ]
+    },
+    {
+        id: "FMX8OywU_jc",
+        title: "[어프로치 6회 - 20번] & [어프로치 7회 - 9번, 10번, 11번, 20번]",
+        chapters: [
+            // { t: 0, label: "6회 20번" },
+            // { t: 0, label: "7회 9번" },
+            // { t: 0, label: "7회 10번" },
+            // { t: 0, label: "7회 11번" },
+            // { t: 0, label: "7회 20번" },
+        ]
+    },
+    {
+        id: "5oyCAggz-Po",
+        title: "[어프로치 6회 - 14번] & [어프로치 7회 - 12번, 13번, 14번]",
+        chapters: [
+            // { t: 0, label: "6회 14번" },
+            // { t: 0, label: "7회 12번" },
+            // { t: 0, label: "7회 13번" },
+            // { t: 0, label: "7회 14번" },
+        ]
+    },
+    {
+        id: "aZxiSmgjeHw",
+        title: "[어프로치 5회 - 12번, 13번, 14번, 21번] & [어프로치 6회 - 12번, 13번]",
+        chapters: [
+            // { t: 0, label: "5회 12번" },
+            // { t: 0, label: "5회 13번" },
+            // { t: 0, label: "5회 14번" },
+            // { t: 0, label: "5회 21번" },
+            // { t: 0, label: "6회 12번" },
+            // { t: 0, label: "6회 13번" },
+        ]
+    },
+    {
+        id: "aPCpFTi2Fbg",
+        title: "[어프로치 4회 - 10번, 11번, 20번] & [어프로치 5회 - 9번, 10번, 11번]",
+        chapters: [
+            // { t: 0, label: "4회 10번" },
+            // { t: 0, label: "4회 11번" },
+            // { t: 0, label: "4회 20번" },
+            // { t: 0, label: "5회 9번" },
+            // { t: 0, label: "5회 10번" },
+            // { t: 0, label: "5회 11번" },
+        ]
+    },
+    {
+        id: "cbtBRbbkltY",
+        title: "[어프로치 3회 - 9번, 10번, 11번, 20번] & [어프로치 4회 - 9번]",
+        chapters: [
+            // { t: 0, label: "3회 9번" },
+            // { t: 0, label: "3회 10번" },
+            // { t: 0, label: "3회 11번" },
+            // { t: 0, label: "3회 20번" },
+            // { t: 0, label: "4회 9번" },
+        ]
+    },
+];
+
+let currentId = null;
+
+function toTime(t) {
+    const h = Math.floor(t / 3600);
+    const m = Math.floor((t % 3600) / 60);
+    const s = t % 60;
+    const mm = String(m).padStart(2, '0');
+    const ss = String(s).padStart(2, '0');
+    return h > 0 ? `${h}:${mm}:${ss}` : `${m}:${ss}`;
+}
+
+function select(idx) {
+    const lec = lectures[idx];
+    currentId = lec.id;
+
+    document.querySelectorAll('.list-item').forEach((el, i) => {
+        el.classList.toggle('active', i === idx);
+    });
+
+    document.getElementById('placeholder').style.display = 'none';
+    document.getElementById('playerArea').style.display = 'flex';
+
+    document.getElementById('ytFrame').src =
+        `https://www.youtube.com/embed/${lec.id}?autoplay=1&rel=0`;
+
+    const list = document.getElementById('indexList');
+    const active = lec.chapters.filter(ch => ch && ch.t !== undefined);
+    if (!active.length) {
+        list.innerHTML = '<div class="no-ch">타임라인이 아직 없습니다</div>';
+    } else {
+        list.innerHTML = `<div class="ch-grid">${
+            active.map(ch => `
+                <button class="ch-btn" onclick="seek(${ch.t})">
+                    <span class="ch-time">${toTime(ch.t)}</span>
+                    <span class="ch-label">${ch.label}</span>
+                </button>
+            `).join('')
+        }</div>`;
+    }
+
+    if (window.innerWidth <= 720) {
+        document.getElementById('playerArea').scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+function seek(t) {
+    document.getElementById('ytFrame').src =
+        `https://www.youtube.com/embed/${currentId}?autoplay=1&start=${t}&rel=0`;
+}
+
+document.getElementById('lectureList').innerHTML = lectures.map((lec, i) => `
+    <div class="list-item" onclick="select(${i})">${lec.title}</div>
+`).join('');
+</script>
 </body>
 </html>
