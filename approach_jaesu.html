@@ -4,127 +4,338 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>재수반 - 강의 목록</title>
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
-    
     <style>
+        *, *::before, *::after { box-sizing: border-box; }
         body {
             font-family: 'Noto Sans KR', sans-serif;
             background-color: #121212;
-            color: #ffffff;
+            color: #fff;
             margin: 0;
-            padding: 40px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            padding: 24px 20px;
+            min-height: 100vh;
         }
-        .wrapper {
-            width: 100%;
-            max-width: 900px;
-        }
+        .wrapper { max-width: 1200px; margin: 0 auto; }
+
         .back-btn {
             display: inline-block;
-            margin-bottom: 20px;
-            cursor: pointer;
+            margin-bottom: 16px;
             color: #a3a3a3;
             text-decoration: none;
             font-size: 14px;
+            cursor: pointer;
+            transition: color 0.2s;
         }
-        .back-btn:hover { color: #ffffff; }
-        
-        .lecture-container {
-            background-color: #1a1a1a;
-            border-radius: 14px;
-            padding: 30px;
-            box-sizing: border-box;
-            border: 1px solid #262626;
-        }
-        h1 {
-            font-size: 24px;
+        .back-btn:hover { color: #fff; }
+
+        .page-title {
+            font-size: 22px;
             font-weight: 700;
-            margin: 0 0 25px 0;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #262626;
-            color: #dc2626; /* 재수반 레드 포인트 */
+            color: #dc2626;
+            margin: 0 0 20px 0;
         }
-        .lecture-item {
+
+        .layout {
+            display: grid;
+            grid-template-columns: 290px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+
+        /* ── 왼쪽 강의 목록 ── */
+        .list-panel {
+            background: #1a1a1a;
+            border: 1px solid #262626;
+            border-radius: 14px;
+            position: sticky;
+            top: 20px;
+            max-height: calc(100vh - 100px);
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #333 transparent;
+        }
+        .list-header {
+            padding: 14px 18px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #737373;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #262626;
+            position: sticky;
+            top: 0;
+            background: #1a1a1a;
+            border-radius: 14px 14px 0 0;
+            z-index: 1;
+        }
+        .list-item {
+            padding: 13px 18px;
+            font-size: 13px;
+            color: #d4d4d4;
+            line-height: 1.5;
+            cursor: pointer;
+            border-bottom: 1px solid #1e1e1e;
+            transition: background 0.15s, color 0.15s;
+        }
+        .list-item:last-child { border-bottom: none; }
+        .list-item:hover { background: #222; color: #fff; }
+        .list-item.active {
+            background: #450a0a;
+            color: #fca5a5;
+            padding-left: 15px;
+            border-left: 3px solid #dc2626;
+        }
+
+        /* ── 오른쪽 콘텐츠 ── */
+        .content { display: flex; flex-direction: column; gap: 16px; }
+
+        .placeholder {
+            background: #1a1a1a;
+            border: 1px solid #262626;
+            border-radius: 14px;
+            aspect-ratio: 16/9;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            padding: 20px 10px;
-            border-bottom: 1px solid #262626;
-            transition: background-color 0.2s;
+            justify-content: center;
+            gap: 12px;
+            color: #555;
         }
-        .lecture-item:hover {
-            background-color: #222222;
+        .placeholder-icon { font-size: 44px; opacity: 0.4; }
+        .placeholder-text { font-size: 14px; }
+
+        #playerArea { display: flex; flex-direction: column; gap: 16px; }
+
+        .video-wrap {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%;
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
         }
-        .lecture-item:last-child { border-bottom: none; }
-        
-        .lecture-title {
-            font-size: 16px;
-            font-weight: 500;
-            color: #e5e5e5;
-            line-height: 1.4;
+        .video-wrap iframe {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
         }
-        .btn-play {
-            background-color: #dc2626;
-            color: #ffffff;
-            text-decoration: none;
-            padding: 10px 20px;
-            font-size: 14px;
-            border-radius: 6px;
-            font-weight: 500;
+
+        /* ── 목차 인덱스 ── */
+        .index-panel {
+            background: #1a1a1a;
+            border: 1px solid #262626;
+            border-radius: 12px;
+            padding: 20px;
+        }
+        .index-header {
+            font-size: 11px;
+            font-weight: 700;
+            color: #737373;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+        .ch-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 8px;
+        }
+        .ch-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #111;
+            border: 1px solid #262626;
+            border-radius: 8px;
+            padding: 10px 12px;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .ch-btn:hover { background: #3b0a0a; border-color: #dc2626; }
+        .ch-time {
+            font-size: 12px;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+            color: #dc2626;
             white-space: nowrap;
-            transition: background-color 0.2s;
         }
-        .btn-play:hover { background-color: #b91c1c; }
+        .ch-label { font-size: 13px; color: #d4d4d4; }
+        .no-ch { font-size: 13px; color: #555; padding: 4px 0; }
+
+        @media (max-width: 720px) {
+            .layout { grid-template-columns: 1fr; }
+            .list-panel { position: static; max-height: 200px; }
+        }
     </style>
 </head>
 <body>
+<div class="wrapper">
+    <div class="back-btn" onclick="history.back()">← 메인 화면으로</div>
+    <h1 class="page-title">재수반 전용 강의 리스트</h1>
 
-    <div class="wrapper">
-        <div class="back-btn" onclick="history.back()">← 메인 화면으로</div>
+    <div class="layout">
+        <aside class="list-panel">
+            <div class="list-header">강의 목록</div>
+            <div id="lectureList"></div>
+        </aside>
 
-        <div class="lecture-container">
-            <h1>재수반 전용 강의 리스트</h1>
+        <section class="content">
+            <div class="placeholder" id="placeholder">
+                <div class="placeholder-icon">▶</div>
+                <div class="placeholder-text">왼쪽에서 강의를 선택하세요</div>
+            </div>
 
-            <!-- 보내주신 8개 강의 목록 연동 -->
-            <div class="lecture-item">
-                <div class="lecture-title">[해인수 미적 적분법 - 3번, 4번, 5번, 6번]</div>
-                <a href="https://youtu.be/-NColbzSAIM?si=Tsk3PJTiFzSl1Mgi" target="_blank" class="btn-play">영상 보기</a>
+            <div id="playerArea" style="display:none">
+                <div class="video-wrap">
+                    <iframe id="ytFrame" allowfullscreen
+                        allow="autoplay; encrypted-media; picture-in-picture"></iframe>
+                </div>
+                <div class="index-panel">
+                    <div class="index-header">목차 (타임라인)</div>
+                    <div id="indexList"></div>
+                </div>
             </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[해인수 미적 적분법 - 2번]</div>
-                <a href="https://youtu.be/HIBg0IAeSIo?si=j5dTHz1NQnPrmZqO" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[해인수 미적 미분법 - 71번, 72번]</div>
-                <a href="https://youtu.be/72I8NuKIl_8?si=cJMPQPCJdjAe_Pgs" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[브릿지 5회 - 12번, 14번]</div>
-                <a href="https://youtu.be/UrxACAHLNYY?si=0U18brA_49ZbFqrx" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[더프 5월 - 22번] & [브릿지 4회 - 14번]</div>
-                <a href="https://youtu.be/uF44ToBsU2I?si=EJ9xI_SmKyTOK7W9" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[더프 5월 - 14번, 15번, 21번]</div>
-                <a href="https://youtu.be/lk3fOnd8jNk?si=ywWBKJGsHXEoypIq" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[더프 5월 - 29번, 30번] & [해인수 미적 - 54번, 60번]</div>
-                <a href="https://youtu.be/j4ZjiIMEyBw?si=ZRB   ZCrErtHgWLNZo" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-            <div class="lecture-item">
-                <div class="lecture-title">[해인수 미적 - 65번, 66번, 67번, 69번]</div>
-                <a href="https://youtu.be/GuLah4YphTc?si=jvs-MUTr8MF7Mt6x" target="_blank" class="btn-play">영상 보기</a>
-            </div>
-        </div>
+        </section>
     </div>
+</div>
 
+<script>
+// =====================================================================
+// 강의 데이터 — chapters 배열에 타임라인을 추가하세요
+// 형식: { t: 초(숫자), label: "문제명" }
+// 예시: { t: 0, label: "3번" }, { t: 312, label: "4번" }
+// =====================================================================
+const lectures = [
+    {
+        id: "-NColbzSAIM",
+        title: "[해인수 미적 적분법 - 3번, 4번, 5번, 6번]",
+        chapters: [
+             { t: 0, label: "3번" },
+             { t: 1275, label: "4번 (적분법)" },
+             { t: 1980, label: "5번 (적분법)" },
+             { t: 2980, label: "6번 (적분법)" },
+        ]
+    },
+    {
+        id: "HIBg0IAeSIo",
+        title: "[해인수 미적 적분법 - 2번]",
+        chapters: [
+            // { t: 0, label: "2번" },
+        ]
+    },
+    {
+        id: "72I8NuKIl_8",
+        title: "[해인수 미적 미분법 - 71번, 72번]",
+        chapters: [
+            // { t: 0, label: "71번" },
+            // { t: 0, label: "72번" },
+        ]
+    },
+    {
+        id: "UrxACAHLNYY",
+        title: "[브릿지 5회 - 12번, 14번]",
+        chapters: [
+            // { t: 0, label: "12번" },
+            // { t: 0, label: "14번" },
+        ]
+    },
+    {
+        id: "uF44ToBsU2I",
+        title: "[더프 5월 - 22번] & [브릿지 4회 - 14번]",
+        chapters: [
+            // { t: 0, label: "더프 5월 22번" },
+            // { t: 0, label: "브릿지 4회 14번" },
+        ]
+    },
+    {
+        id: "lk3fOnd8jNk",
+        title: "[더프 5월 - 14번, 15번, 21번]",
+        chapters: [
+            // { t: 0, label: "14번" },
+            // { t: 0, label: "15번" },
+            // { t: 0, label: "21번" },
+        ]
+    },
+    {
+        id: "j4ZjiIMEyBw",
+        title: "[더프 5월 - 29번, 30번] & [해인수 미적 - 54번, 60번]",
+        chapters: [
+            // { t: 0, label: "더프 5월 29번" },
+            // { t: 0, label: "더프 5월 30번" },
+            // { t: 0, label: "해인수 54번" },
+            // { t: 0, label: "해인수 60번" },
+        ]
+    },
+    {
+        id: "GuLah4YphTc",
+        title: "[해인수 미적 - 65번, 66번, 67번, 69번]",
+        chapters: [
+            // { t: 0, label: "65번" },
+            // { t: 0, label: "66번" },
+            // { t: 0, label: "67번" },
+            // { t: 0, label: "69번" },
+        ]
+    },
+];
+
+let currentId = null;
+
+function toTime(t) {
+    const h = Math.floor(t / 3600);
+    const m = Math.floor((t % 3600) / 60);
+    const s = t % 60;
+    const mm = String(m).padStart(2, '0');
+    const ss = String(s).padStart(2, '0');
+    return h > 0 ? `${h}:${mm}:${ss}` : `${m}:${ss}`;
+}
+
+function select(idx) {
+    const lec = lectures[idx];
+    currentId = lec.id;
+
+    document.querySelectorAll('.list-item').forEach((el, i) => {
+        el.classList.toggle('active', i === idx);
+    });
+
+    document.getElementById('placeholder').style.display = 'none';
+    document.getElementById('playerArea').style.display = 'flex';
+
+    document.getElementById('ytFrame').src =
+        `https://www.youtube.com/embed/${lec.id}?autoplay=1&rel=0`;
+
+    const list = document.getElementById('indexList');
+    const active = lec.chapters.filter(ch => ch && ch.t !== undefined);
+    if (!active.length) {
+        list.innerHTML = '<div class="no-ch">타임라인이 아직 없습니다</div>';
+    } else {
+        list.innerHTML = `<div class="ch-grid">${
+            active.map(ch => `
+                <button class="ch-btn" onclick="seek(${ch.t})">
+                    <span class="ch-time">${toTime(ch.t)}</span>
+                    <span class="ch-label">${ch.label}</span>
+                </button>
+            `).join('')
+        }</div>`;
+    }
+
+    if (window.innerWidth <= 720) {
+        document.getElementById('playerArea').scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+function seek(t) {
+    document.getElementById('ytFrame').src =
+        `https://www.youtube.com/embed/${currentId}?autoplay=1&start=${t}&rel=0`;
+}
+
+document.getElementById('lectureList').innerHTML = lectures.map((lec, i) => `
+    <div class="list-item" onclick="select(${i})">${lec.title}</div>
+`).join('');
+</script>
 </body>
 </html>
