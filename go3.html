@@ -66,6 +66,11 @@
             grid-template-columns: repeat(2, 1fr); /* 가로로 딱 2개만 배치 */
             gap: 20px;
         }
+        @media (max-width: 600px) {
+            .card-container {
+                grid-template-columns: 1fr; /* 세로로 일렬(1칸) 정렬로 변경! */
+                }
+        }
         .card {
             flex: 1;
             max-width: 490px; /* 카드가 늘어날 때 균형을 잡기 위함 */
