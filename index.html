@@ -1,6 +1,26 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+   <script>
+    // 💡 원하시는 비밀번호를 여기에 적으세요 (예: 1234)
+    const CORRECT_PASSWORD = "192837"; 
+    
+    // 브라우저 로컬 저장소에 '로그인 성공 인증 쿠키'가 있는지 확인
+    if (localStorage.getItem("math_auth") !== "true") {
+        let passwordInput = prompt("철호T의 수업 영상 저장소\n비밀번호를 입력하세요:");
+        
+        if (passwordInput === CORRECT_PASSWORD) {
+            // 비밀번호가 맞으면 인증 성공 표시를 남겨서, 다음부턴 귀찮게 안 물어보게 함
+            localStorage.setItem("math_auth", "true");
+        } else {
+            alert("비밀번호가 틀렸습니다.");
+            // 틀리면 빈 화면으로 고정하거나 뒤로 보냄
+            history.back();
+            window.location.href = "about:blank"; 
+        }
+    }
+</script>
+
    <!-- 카톡 제목 -->
   <meta property="og:title" content="철호T의 수업 영상 저장소">
   
