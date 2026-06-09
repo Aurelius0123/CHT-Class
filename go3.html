@@ -62,7 +62,8 @@
         }
         /* 🗂️ 카드 컨테이너 */
         .card-container {
-            display: flex;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 가로로 딱 2개만 배치 */
             gap: 20px;
         }
         .card {
