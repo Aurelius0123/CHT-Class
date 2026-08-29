@@ -52,7 +52,7 @@
         .banner-title {
             font-size: 32px;
             font-weight: 700;
-            margin: 0 0 12px 0;
+            margin: 0;
             letter-spacing: -1px;
         }
         .banner-desc {
@@ -60,29 +60,30 @@
             opacity: 0.8;
             margin: 0;
         }
-        /* 🗂️ 카드 컨테이너 */
+        /* 🗂️ 카드 컨테이너 (2열 정렬) */
         .card-container {
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* 가로로 딱 2개만 배치 */
+            grid-template-columns: repeat(2, 1fr);
             gap: 20px;
+            align-items: start;
         }
         @media (max-width: 600px) {
             .card-container {
-                grid-template-columns: 1fr; /* 세로로 일렬(1칸) 정렬로 변경! */
-                }
+                grid-template-columns: 1fr;
+            }
         }
         .card {
-            flex: 1;
-            max-width: 490px; /* 카드가 늘어날 때 균형을 잡기 위함 */
             background-color: #1a1a1a;
             border-radius: 12px;
-            padding: 35px 25px;
+            padding: 30px 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
             transition: background-color 0.2s ease, transform 0.2s ease;
             border: 1px solid #262626;
+            box-sizing: border-box;
+            width: 100%;
         }
         .card:hover {
             background-color: #242424;
@@ -110,16 +111,12 @@
         .card:hover .arrow {
             color: #ffffff;
         }
-        @media (max-width: 600px) {
-            .card-container { flex-direction: column; }
-            .card { max-width: 100%; }
-        }
     </style>
 </head>
 <body>
 
     <div class="wrapper">
- <div class="back-btn" onclick="window.location.href='index.html'">← 메인 화면으로</div>
+        <div class="back-btn" onclick="window.location.href='index.html'">← 메인 화면으로</div>
 
         <div class="main-banner">
             <h1 class="banner-title">현역반 영상 저장소</h1>
@@ -127,16 +124,15 @@
         </div>
 
         <div class="card-container">
-
-        <div class="card" onclick="window.location.href='go3_gt.html'">
+            
+            <div class="card" onclick="window.location.href='go3_gt.html'">
                 <div class="card-info">
                     <span class="card-title">공통</span>
                     <span class="card-sub">공통 강의 리스트</span>
                 </div>
                 <div class="arrow">＞</div>
+            </div>
 
-        
-            
             <div class="card" onclick="window.location.href='go3_mj.html'">
                 <div class="card-info">
                     <span class="card-title">미적분</span>
@@ -145,9 +141,6 @@
                 <div class="arrow">＞</div>
             </div>
 
-            
-            </div>
-            <!-- [확통 카드] -->
             <div class="card" onclick="window.location.href='go3_ht.html'">
                 <div class="card-info">
                     <span class="card-title">확통</span>
@@ -156,18 +149,6 @@
                 <div class="arrow">＞</div>
             </div>
 
-
-            
-            <!-- 💡 나중에 고3반에 새 카드를 하나 더 나란히 추가하려면 아래 코드를 붙여넣으세요 -->
-            <!--
-            <div class="card" onclick="window.location.href='새로운파일.html'">
-                <div class="card-info">
-                    <span class="card-title">새로운 과정 이름</span>
-                    <span class="card-sub">여기에 과정에 대한 설명을 적으세요</span>
-                </div>
-                <div class="arrow">＞</div>
-            </div>
-            -->
         </div>
     </div>
 
